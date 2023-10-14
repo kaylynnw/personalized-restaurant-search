@@ -2,14 +2,15 @@ import os
 
 from dotenv import load_dotenv
 
-from agent import Agent
+from menu_parse_agent import MenuParseAgent
 from models.question import Question
+from restaurant_retrieval_agent import RestaurantRetrievalAgent
 
 load_dotenv()
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 
 
-def create_prompt(user_address: str):
+def create_restaurant_retrieval_prompt(user_address: str):
     return f"""
     # Goal
     You are trying to find the menus of the closest restaurants nearby.
@@ -28,15 +29,45 @@ def create_prompt(user_address: str):
     """
 
 
+def create_menu_parse_prompt(restaurant_details: str, dietary_restrictions: str):
+    return f"""
+    # Goal
+    You are trying to find restaurants that are compatible with your dietary restrictions.
+    
+    # This is the process you will follow to find this information.
+    For each restaurant in the list: 
+    1. You will then learn what the menu says. 
+    2. Based off of the menu content, is this menu compatible with your dietary restrictions? 
+    Answer as succinctly as possible, but make sure to include the restaurant name. 
+    
+    # Restaurant Info
+    The restaurant url included in the following: {restaurant_details}
+    
+    # Your dietary restrictions
+    Your dietary restrictions are {dietary_restrictions}
+    """
+
+
 class QueryService:
 
     def __init__(self):
-        self.agent = Agent()
+        self.restaurant_retrieval_agent = RestaurantRetrievalAgent()
+        self.menu_parse_agent = MenuParseAgent()
 
     def query(self, question: Question):
-        prompt = create_prompt(question.address)
+        restaurant_retrieval_prompt = create_restaurant_retrieval_prompt(question.address)
         try:
-            answer = self.agent.run_agent(prompt)
+            restaurant_info = self.restaurant_retrieval_agent.run_agent(restaurant_retrieval_prompt)
+            restaurants = restaurant_info.strip().split('\n')
+            answer = ''
+
+            for restaurant in restaurants:
+                restaurant_string = f"{restaurant}"
+                try:
+                    answer += self.menu_parse_agent.run_agent(
+                        create_menu_parse_prompt(restaurant_string, question.dietaryRestrictions))
+                except Exception as e:
+                    print(f"ERROR --- address:{question.address} --- {e} ")
         except Exception as e:
             print(f"ERROR --- address:{question.address} --- {e} ")
             raise e
