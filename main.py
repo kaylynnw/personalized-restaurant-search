@@ -1,14 +1,16 @@
 import logging
 import sys
 from contextlib import asynccontextmanager
+import random
 
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from models.question import Question
 from query_service import QueryService
+from query_image_service import QueryImageService
 
 load_dotenv()
 
@@ -17,6 +19,7 @@ allowed_origins = [
 ]
 
 query_service = QueryService()
+query_image_service = QueryImageService()
 
 
 def init_logging():
