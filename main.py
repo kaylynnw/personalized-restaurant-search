@@ -52,5 +52,12 @@ async def query(question: Question):
     return query_service.query(question=question)
 
 
+@app.post("/image/")
+async def image(file: Annotated[bytes, UploadFile()], question: Question):
+    filename = random.getrandbits(128) + "-" + file.filename
+    open(filename, "wb").write(file)
+    return query_image_service.image_menu_search(image_path=filename, question=question)
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
