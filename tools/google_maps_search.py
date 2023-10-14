@@ -1,5 +1,6 @@
 import requests
 
+
 def get_lat_lng_from_address(api_key, address):
     """
     (Refer to the previously provided function for the details)
@@ -13,6 +14,7 @@ def get_lat_lng_from_address(api_key, address):
         return None
     location = result['results'][0]['geometry']['location']
     return location['lat'], location['lng']
+
 
 def get_place_details(api_key, place_id):
     """
@@ -33,6 +35,7 @@ def get_place_details(api_key, place_id):
         print(f"API Request Error: {result['status']}")
         return None
     return result['result']
+
 
 def find_nearby_restaurants(api_key, latitude, longitude, radius=500):
     """
@@ -66,7 +69,6 @@ def find_nearby_restaurants(api_key, latitude, longitude, radius=500):
         name = place.get('name', 'Unknown Name')
         place_id = place.get('place_id', '')
 
-        # Get additional details from Place Details API
         details = get_place_details(api_key, place_id)
         website = details.get('website', 'Website not available') if details else 'Website not available'
 
@@ -89,12 +91,10 @@ def google_maps_search(api_key, address, radius=500):
     Returns:
     - list: List of nearby restaurants and their website.
     """
-    # Get latitude and longitude from address
     latitude, longitude = get_lat_lng_from_address(api_key, address)
     if latitude is None or longitude is None:
-        return None  # or consider raising an exception
+        return None  # maybe raise an exception
 
-    # Get nearby restaurants
     restaurants = find_nearby_restaurants(api_key, latitude, longitude, radius)
     if not restaurants:
         return "Unable to find nearby restaurants."

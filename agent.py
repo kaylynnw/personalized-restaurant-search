@@ -2,7 +2,7 @@ from langchain.agents import initialize_agent, AgentType
 from langchain.chat_models import ChatOpenAI
 
 from config import CHAT_MODEL
-from tools.beautiful_soup_loader_tool import BeautifulSoupLoaderTool
+from tools.restaurant_menu_search_tool import RestaurantMenuSearchTool
 from tools.google_maps_search_tool import GoogleMapsSearchTool
 
 
@@ -13,7 +13,7 @@ class Agent:
         self.agent = self.create_agent()
 
     def create_agent(self):
-        tools = [GoogleMapsSearchTool(), BeautifulSoupLoaderTool()]
+        tools = [GoogleMapsSearchTool(), RestaurantMenuSearchTool()]
         return initialize_agent(
             tools, self.llm, agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True
         )

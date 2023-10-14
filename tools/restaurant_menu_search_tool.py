@@ -7,18 +7,17 @@ from langchain.callbacks.manager import (
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
 
-from tools.beautiful_soup_loader import get_likely_menu
+from tools.restaurant_menu_search import get_likely_menu
 
 
-class BeautifulSoupLoaderInput(BaseModel):
+class RestaurantMenuSearchInput(BaseModel):
     url: str = Field(description="website to scrape")
 
 
-# Define the custom tool by subclassing the BaseTool class
-class BeautifulSoupLoaderTool(BaseTool):
-    name = "BeautifulSoupLoader"
+class RestaurantMenuSearchTool(BaseTool):
+    name = "RestaurantMenuSearch"
     description = "retrieves information about a website that will be helpful to find the menu"
-    args_schema: Type[BeautifulSoupLoaderInput] = BeautifulSoupLoaderInput
+    args_schema: Type[RestaurantMenuSearchInput] = RestaurantMenuSearchInput
 
     def _run(
             self,
@@ -34,6 +33,4 @@ class BeautifulSoupLoaderTool(BaseTool):
             run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
         """Use the tool asynchronously."""
-        # Asynchronous implementation of google_maps_search if desired/necessary
-        # For simplicity, the sync version is used here
         return get_likely_menu(url)
