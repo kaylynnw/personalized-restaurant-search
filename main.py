@@ -6,8 +6,8 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sse_starlette.sse import EventSourceResponse
 
-from models.question import Question
 from query_service import QueryService
 
 load_dotenv()
@@ -47,9 +47,9 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.post("/query/")
-async def query(question: Question):
-    return query_service.query(question=question)
+@app.get("/query/")
+async def query(address: str, dietary_restrictions: str):
+    return EventSourceResponse(query_service.query(address=address, dietary_restrictions=dietary_restrictions))
 
 
 if __name__ == "__main__":

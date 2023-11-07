@@ -16,3 +16,4 @@ fastapi-sessions
 requests
 pydantic~=1.10.12
 bs4
+sse-starlette

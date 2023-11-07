@@ -2,16 +2,13 @@ import requests
 
 
 def get_lat_lng_from_address(api_key, address):
-    """
-    (Refer to the previously provided function for the details)
-    """
     endpoint_url = "https://maps.googleapis.com/maps/api/geocode/json"
     params = {'address': address, 'key': api_key}
     response = requests.get(endpoint_url, params=params)
     result = response.json()
     if result['status'] != 'OK':
-        print(f"API Request Error: {result['status']}")
-        return None
+        raise Exception(f"ERROR: {result['status']} - Could not retrieve the latitude and/or longitude from given "
+                        f"address {address}")
     location = result['results'][0]['geometry']['location']
     return location['lat'], location['lng']
 
@@ -32,8 +29,7 @@ def get_place_details(api_key, place_id):
     response = requests.get(endpoint_url, params=params)
     result = response.json()
     if result['status'] != 'OK':
-        print(f"API Request Error: {result['status']}")
-        return None
+        raise Exception(f"ERROR: {result['status']} - Could not retrieve the place details")
     return result['result']
 
 
@@ -61,8 +57,7 @@ def find_nearby_restaurants(api_key, latitude, longitude, radius=500):
     response = requests.get(endpoint_url, params=params)
     results = response.json()
     if results['status'] != 'OK':
-        print(f"API Request Error: {results['status']}")
-        return None
+        raise Exception(f"ERROR: {results['status']} - Could not retrieve the nearby restaurants")
 
     restaurants = []
     for place in results['results']:
@@ -92,8 +87,6 @@ def google_maps_search(api_key, address, radius=500):
     - list: List of nearby restaurants and their website.
     """
     latitude, longitude = get_lat_lng_from_address(api_key, address)
-    if latitude is None or longitude is None:
-        return None  # maybe raise an exception
 
     restaurants = find_nearby_restaurants(api_key, latitude, longitude, radius)
     if not restaurants:

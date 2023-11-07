@@ -21,13 +21,12 @@ def find_menu_in_content(soup):
         elements = soup.find_all(tag, string=lambda text: 'menu' in text.lower() if text else False)
         likely_menus.extend(elements)
 
-    for element in likely_menus:
-        print(f"{element.name}: {element.get_text(strip=True)}")
-
     return likely_menus
 
 
 def get_likely_menu(url):
     likely_options = get_website_content(url)
+    print("------ Likely Options for the Restaurant Menu ------")
     print(likely_options)
+    print("-------------------")
     return likely_options
