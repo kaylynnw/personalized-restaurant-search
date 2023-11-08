@@ -9,8 +9,8 @@ def parse_menu_text(url):
         response = requests.get(url)
         response.raise_for_status()
     except requests.RequestException as e:
-        print(f"Failed to get the website content: {e}")
-        return None
+        print(f"Failed to get the menu content: {e}")
+        raise Exception(f"ERROR: Failed to get menu content")
 
     soup = BeautifulSoup(response.text, 'html.parser')
     texts = soup.stripped_strings
@@ -22,7 +22,6 @@ def parse_menu_text(url):
     text = ""
     for tag in tags:
         for element in soup.find_all(tag):
-            # Append text and ensure it does not exceed the character limit
             text += element.get_text(strip=True) + " "
             if len(text) >= CHAR_LIMIT:
                 return text[:CHAR_LIMIT]

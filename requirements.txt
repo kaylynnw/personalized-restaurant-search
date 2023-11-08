@@ -1,4 +1,4 @@
-openai==0.27.1
+openai
 redis==4.5.1
 requests==2.28.2
 termcolor==2.2.0

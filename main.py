@@ -49,8 +49,7 @@ async def root():
 
 @app.get("/query/")
 async def query(address: str, dietary_restrictions: str):
-    return EventSourceResponse(query_service.query(address=address, dietary_restrictions=dietary_restrictions))
-
+    return EventSourceResponse(query_service.query(address, dietary_restrictions))
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

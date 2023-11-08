@@ -1,5 +1,7 @@
 import requests
 
+MAX_NUMBER_OF_RESTAURANTS = 1
+
 
 def get_lat_lng_from_address(api_key, address):
     endpoint_url = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -63,14 +65,21 @@ def find_nearby_restaurants(api_key, latitude, longitude, radius=500):
     for place in results['results']:
         name = place.get('name', 'Unknown Name')
         place_id = place.get('place_id', '')
+        lat = place['geometry']['location']['lat'] if 'geometry' in place and 'location' in place['geometry'] else None
+        lng = place['geometry']['location']['lng'] if 'geometry' in place and 'location' in place['geometry'] else None
 
         details = get_place_details(api_key, place_id)
-        website = details.get('website', 'Website not available') if details else 'Website not available'
+        if details:
+            website = details.get('website')
+            restaurants.append({
+                'name': name,
+                'website': website,
+                'latitude': lat,
+                'longitude': lng
+            })
 
-        restaurants.append({
-            'name': name,
-            'website': website
-        })
+        if len(restaurants) >= MAX_NUMBER_OF_RESTAURANTS:
+            return restaurants
     return restaurants
 
 
@@ -98,7 +107,8 @@ def google_maps_search(api_key, address, radius=500):
         search_results_str += (
             f"{i}. Name: {restaurant['name']}\n"
             f"   Website: {restaurant['website']}\n"
-            "---------------------\n"
+            f"   Latitude: {restaurant['latitude']}\n"
+            f"   Longitude: {restaurant['longitude']}\n"
         )
 
     return search_results_str.rstrip('-')

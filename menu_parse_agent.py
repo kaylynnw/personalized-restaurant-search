@@ -14,10 +14,10 @@ class MenuParseAgent:
     def create_agent(self):
         tools = [ParseMenuTool()]
         return initialize_agent(
-            tools, self.llm, agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True
+            tools, self.llm, agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True,
+            max_iterations=2
         )
 
     def run_agent(self, prompt):
         response = self.agent.run(prompt)
-        print(response)
         return response
