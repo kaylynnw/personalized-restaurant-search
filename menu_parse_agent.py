@@ -19,5 +19,4 @@ class MenuParseAgent:
 
     def run_agent(self, prompt):
         response = self.agent.run(prompt)
-        print(response)
         return response

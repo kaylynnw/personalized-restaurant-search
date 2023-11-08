@@ -32,18 +32,22 @@ def create_restaurant_retrieval_prompt(user_address: str):
 
 
 def create_menu_parse_prompt(restaurant_details: str, dietary_restrictions: str):
-    return f"""
+    return f"""    
     ### Goal
     You are trying to find restaurants that are compatible with your dietary restrictions.
     
     ### This is the process you will follow to find this information.
-    For each restaurant in the list: 
-    1. You will then learn what the menu says. 
-    2. Based off of the menu content, is this menu compatible with your dietary restrictions? 
-    Answer as succinctly as possible.
+    1. Based off of the menu content, is this menu compatible with your dietary restrictions? 
     
-    ### Desired format of response
-    an array with the a json object with the following fields: restaurant_name (string), is_compatible (boolean), details (string)
+    ### Example Answer Format
+    Jitterbug Cafe: 
+    - Yes, I think this place looks great! 
+    - The Jitterbug Cafe offers a BLT bagel sandwich, overnight oats, and muffins. All great options for a vegetarian. 
+    
+    ### Example Answer Format
+    Snack'ums: 
+    - Not recommended. 
+    - Snack'ums offers complimentary peanuts to every guest. So, I don't think this would be a good place for your severe peanut allergy.  
     
     ### Restaurant Info
     The restaurant url included in the following: {restaurant_details}
@@ -64,21 +68,34 @@ class QueryService:
             restaurant_retrieval_prompt = create_restaurant_retrieval_prompt(address)
             try:
                 restaurant_info = self.restaurant_retrieval_agent.run_agent(restaurant_retrieval_prompt)
-                yield {"data": f"\"{{ {restaurant_info} }}\""}
+                # yield {"data": f"\"{{ {restaurant_info} }}\""}
                 print(restaurant_info)
             except Exception as e:
                 print(f"**************Error:****************** \n {e}")
                 yield {"data": {"error": str(e)}}
                 return
-            # answer = ''
-            #
-            # for restaurant in restaurants:
-            #     restaurant_string = f"{restaurant}"
-            #     try:
-            #         answer += self.menu_parse_agent.run_agent(
-            #             create_menu_parse_prompt(restaurant_string, dietary_restrictions))
-            #         yield {"data": {"restaurant": restaurant_string, "menu": answer}}
-            #     except Exception as e:
-            #         print(f"ERROR --- address:{address} --- {e} ")
+            # restaurant_info = [
+            #     {'restaurant_name': "Toby's Dinner Theatre",
+            #                     'restaurant_menu': 'https://tobysdinnertheatre.com/about-us/whats-on-the-menu/'},
+            #     {'restaurant_name': 'Banditos Tacos & Tequila Columbia',
+            #      'restaurant_menu': 'https://www.banditostnt.com/locations'},
+            #     {'restaurant_name': 'Blackwall Barn & Lodge Columbia',
+            #      'restaurant_menu': 'https://www.barnandlodge.com/columbia/menu/'},
+            #     {'restaurant_name': 'Dok Khao COLUMBIA',
+            #      'restaurant_menu': 'https://www.dokkhao.com/food-drink-menu'},
+            #     {'restaurant_name': 'Toastique - Columbia',
+            #      'restaurant_menu': 'https://toastique.com/menu'},
+            #     {'restaurant_name': 'Busboys and Poets - Columbia',
+            #      'restaurant_menu': 'https://www.busboysandpoets.com/menu/'}]
+
+            for restaurant in restaurant_info:
+                restaurant_string = f"{restaurant}"
+                try:
+                    observations: str = self.menu_parse_agent.run_agent(
+                        create_menu_parse_prompt(restaurant_string, dietary_restrictions))
+
+                    yield {"data": observations}
+                except Exception as e:
+                    print(f"ERROR --- address:{address} --- {e} ")
 
         return event_stream()
