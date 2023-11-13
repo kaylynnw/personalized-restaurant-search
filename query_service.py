@@ -83,7 +83,7 @@ class QueryService:
                 recommendations: str = self.menu_parse_agent.run_agent(
                     create_menu_parse_prompt(restaurant, dietary_restrictions))
                 labelled_recommendations = {"recommendations": recommendations}
-                yield f"data: {json.dumps(labelled_recommendations)}\n\n"
+                # yield f"data: {json.dumps(labelled_recommendations)}\n\n"
             except Exception as e:
                 print(f"**************Error:****************** \n {e}")
                 yield f"data: {json.dumps({'error': 'Experienced an error while analyzing menu'})}\n\n"
